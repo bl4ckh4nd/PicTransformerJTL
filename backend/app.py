@@ -2,7 +2,8 @@
 import os
 import time
 import logging
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, send_from_directory
+from werkzeug.utils import secure_filename
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from dotenv import load_dotenv
@@ -13,7 +14,7 @@ from rembg import remove
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app) # Enable CORS for all routes
+CORS(app, origins=["http://localhost:5173"]) # Enable CORS for Vite development server
 
 INPUT_DIR = "input_images"
 TEMP_DIR = "temp_images"
@@ -22,6 +23,10 @@ OUTPUT_DIR = "output_images"
 os.makedirs(INPUT_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 PROCESSED_IMAGES = {}
 
@@ -101,6 +106,25 @@ def delete_image(image_name):
         logger.error(f"Error deleting image: {e}", exc_info=True)
         return jsonify({"message": "Error deleting image"}), 500
 
+@app.route('/images/upload', methods=['POST'])
+def upload_image():
+    if 'image' not in request.files:
+        return jsonify({"message": "No image part"}), 400
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({"message": "No selected file"}), 400
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(INPUT_DIR, filename)
+        file.save(filepath)
+        logger.info(f"Image uploaded: {filepath}")
+        return jsonify({"message": "File uploaded successfully"})
+    return jsonify({"message": "File type not allowed"}), 400
+
+@app.route('/images/<path:filename>')
+def serve_image(filename):
+    return send_from_directory(OUTPUT_DIR, filename)
+
 if __name__ == '__main__':
     path = INPUT_DIR
     event_handler = ImageHandler()
@@ -108,9 +132,7 @@ if __name__ == '__main__':
     observer.schedule(event_handler, path, recursive=False)
     observer.start()
     try:
-        while True:
-            time.sleep(1)
+        app.run(debug=True)
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
-    app.run(debug=True)

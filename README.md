@@ -26,10 +26,51 @@ This application automates the process of preparing coin images by removing back
     pip install Flask Pillow python-dotenv watchdog rembg flask_cors
     ```
 
-4.  Install the React frontend dependencies:
+4.  Create a Vite-based React frontend:
     ```bash
+    npm create vite@latest frontend --template react
     cd frontend
     npm install
+    ```
+
+5.  Install the necessary TypeScript types for React:
+    ```bash
+    cd frontend
+    npm install @types/react @types/react-dom
+    ```
+
+6.  Add `"jsx": "react-jsx"` to the `compilerOptions` section of `frontend/tsconfig.json`.
+
+7.  Modify `frontend/src/main.ts` to render the React application:
+    ```typescript
+    import React from 'react'
+    import ReactDOM from 'react-dom/client'
+    import App from './App.jsx'
+    import './index.css'
+
+    ReactDOM.createRoot(document.getElementById('app')).render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>,
+    )
+    ```
+
+8.  Rename `frontend/src/App.js` to `frontend/src/App.jsx`.
+
+9.  Create a `vite.config.js` file in the `frontend` directory with the following content:
+    ```javascript
+    import { defineConfig } from 'vite'
+    import react from '@vitejs/plugin-react'
+
+    // https://vitejs.dev/config/
+    export default defineConfig({
+      plugins: [react()],
+      server: {
+        proxy: {
+          '/images': 'http://localhost:5000', // Proxy /images requests to the backend
+        }
+      }
+    })
     ```
 
 ## Configuration
@@ -46,10 +87,10 @@ This application automates the process of preparing coin images by removing back
 2.  Run the frontend:
     ```bash
     cd frontend
-    npm start
+    npm run dev
     ```
 
-3.  Open the frontend in your browser (usually `http://localhost:3000`).
+3.  Open the frontend in your browser (usually `http://localhost:5173`).
 
 4.  Place images in the `input_images` directory. The processed images will appear in the `output_images` directory and in the frontend.
 
@@ -64,7 +105,7 @@ coin_processor/
 │   └── .env
 ├── frontend/
 │   ├── src/
-│   │   ├── App.js
+│   │   ├── App.jsx
 │   │   └── App.css
 │   ├── public/
 │   │   └── index.html
@@ -73,6 +114,3 @@ coin_processor/
 ├── output_images/
 ├── temp_images/
 └── README.md
-```
-
-**Note:** Ensure that `react-scripts` is listed as a dev dependency in `frontend/package.json`.

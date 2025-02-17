@@ -1,21 +1,66 @@
 /* frontend/src/App.css */
 .App {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
   text-align: center;
 }
 
+.upload-section {
+  margin: 2rem 0;
+  padding: 2rem;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+}
+
 .image-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
 .image-item {
-  margin: 10px;
-  border: 1px solid #ccc;
-  padding: 5px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.image-item:hover {
+  transform: translateY(-5px);
 }
 
 .image-item img {
-  max-width: 200px;
-  max-height: 200px;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.image-item button {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: #ff4444;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.image-item button:hover {
+  opacity: 1;
+}
+
+input[type="file"] {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
