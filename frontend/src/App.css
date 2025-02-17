@@ -1,0 +1,21 @@
+/* frontend/src/App.css */
+.App {
+  text-align: center;
+}
+
+.image-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.image-item {
+  margin: 10px;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+.image-item img {
+  max-width: 200px;
+  max-height: 200px;
+}
